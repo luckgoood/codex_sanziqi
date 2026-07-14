@@ -1,0 +1,24 @@
+# Build outputs
+build/
+bin/
+obj/
+*.exe
+*.o
+*.obj
+*.mod
+*.smod
+*.a
+*.lib
+*.dll
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.log
