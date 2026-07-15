@@ -1,9 +1,9 @@
 program tic_tac_toe
   implicit none
 
-  character(len=1) :: board(9)
+  character(len=3) :: board(9)
   integer :: move, turn_count
-  character(len=1) :: winner
+  character(len=3) :: winner
   logical :: finished
 
   call init_board(board)
@@ -11,7 +11,7 @@ program tic_tac_toe
   winner = ' '
   finished = .false.
 
-  print *, '三子棋：玩家 X，对手电脑 O'
+  print *, '三子棋：玩家 △，对手电脑 O'
   print *, '输入 1 到 9 选择位置。位置如下：'
   call print_help()
 
@@ -35,7 +35,7 @@ program tic_tac_toe
 
   call print_board(board)
 
-  if (winner == 'X') then
+  if (winner == '△') then
     print *, '你赢了！'
   else if (winner == 'O') then
     print *, '电脑赢了！'
@@ -46,7 +46,7 @@ program tic_tac_toe
 contains
 
   subroutine init_board(board)
-    character(len=1), intent(out) :: board(9)
+    character(len=3), intent(out) :: board(9)
     integer :: i
 
     do i = 1, 9
@@ -63,7 +63,7 @@ contains
   end subroutine print_help
 
   subroutine print_board(board)
-    character(len=1), intent(in) :: board(9)
+    character(len=3), intent(in) :: board(9)
 
     print *, ''
     print *, ' ', board(1), ' | ', board(2), ' | ', board(3)
@@ -75,7 +75,7 @@ contains
   end subroutine print_board
 
   subroutine player_turn(board, move)
-    character(len=1), intent(inout) :: board(9)
+    character(len=3), intent(inout) :: board(9)
     integer, intent(out) :: move
     integer :: ios
 
@@ -90,20 +90,20 @@ contains
       else if (board(move) /= ' ') then
         print *, '这个位置已经有棋子了。'
       else
-        board(move) = 'X'
+        board(move) = '△'
         exit
       end if
     end do
   end subroutine player_turn
 
   subroutine computer_turn(board, move)
-    character(len=1), intent(inout) :: board(9)
+    character(len=3), intent(inout) :: board(9)
     integer, intent(out) :: move
     integer :: preferred(9)
     integer :: i
 
     move = find_winning_move(board, 'O')
-    if (move == 0) move = find_winning_move(board, 'X')
+    if (move == 0) move = find_winning_move(board, '△')
 
     if (move == 0) then
       preferred = (/5, 1, 3, 7, 9, 2, 4, 6, 8/)
@@ -119,9 +119,9 @@ contains
   end subroutine computer_turn
 
   integer function find_winning_move(board, player) result(move)
-    character(len=1), intent(in) :: board(9)
-    character(len=1), intent(in) :: player
-    character(len=1) :: test_board(9)
+    character(len=3), intent(in) :: board(9)
+    character(len=*), intent(in) :: player
+    character(len=3) :: test_board(9)
     integer :: i
 
     move = 0
@@ -137,8 +137,8 @@ contains
     end do
   end function find_winning_move
 
-  character(len=1) function check_winner(board) result(winner)
-    character(len=1), intent(in) :: board(9)
+  character(len=3) function check_winner(board) result(winner)
+    character(len=3), intent(in) :: board(9)
     integer :: lines(8, 3)
     integer :: i
 
