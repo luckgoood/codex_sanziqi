@@ -21,6 +21,11 @@
 
 ```text
 .
+├── .codex/
+│   ├── hooks.json
+│   ├── hooks/
+│   └── skills/
+│       └── planning-with-files/
 ├── AGENTS.md
 ├── README.md
 ├── build.ps1
@@ -108,6 +113,16 @@ git add <文件>
 git commit -m "<提交说明>"
 git push
 ```
+
+## 项目级 Codex Skill
+
+- 本项目已安装项目级 skill：`planning-with-files`。
+- 安装位置：`.codex/skills/planning-with-files/`
+- 配套 hooks 位置：`.codex/hooks/`
+- hooks 配置文件：`.codex/hooks.json`
+- 这个 skill 是复制到当前仓库中的，不是安装到全局 `C:\Users\li\.codex\skills`。
+- 作用范围应限制在当前项目；在其他项目中不会自动生效，除非那些项目也复制同样的 `.codex` 配置。
+- 该 skill 用于复杂任务时把计划、发现和进度保存为文件，例如 `task_plan.md`、`findings.md`、`progress.md` 或 `.planning/` 下的计划文件。
 
 ## 已知项
 
