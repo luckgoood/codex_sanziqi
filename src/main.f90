@@ -11,20 +11,21 @@ program tic_tac_toe
   winner = ' '
   finished = .false.
 
-  print *, '三子棋双人模式：玩家 1 使用 X，玩家 2 使用 O'
+  print *, '三子棋：玩家 X，对手电脑 O'
   print *, '输入 1 到 9 选择位置。位置如下：'
   call print_help()
 
   do while (.not. finished)
     call print_board(board)
-    call player_turn(board, move, 'X', '玩家 1')
+    call player_turn(board, move)
     turn_count = turn_count + 1
 
     winner = check_winner(board)
     if (winner /= ' ') exit
     if (turn_count == 9) exit
 
-    call player_turn(board, move, 'O', '玩家 2')
+    call computer_turn(board, move)
+    print *, '电脑选择了位置 ', move
     turn_count = turn_count + 1
 
     winner = check_winner(board)
@@ -35,9 +36,9 @@ program tic_tac_toe
   call print_board(board)
 
   if (winner == 'X') then
-    print *, '玩家 1 赢了！'
+    print *, '你赢了！'
   else if (winner == 'O') then
-    print *, '玩家 2 赢了！'
+    print *, '电脑赢了！'
   else
     print *, '平局！'
   end if
@@ -73,15 +74,13 @@ contains
     print *, ''
   end subroutine print_board
 
-  subroutine player_turn(board, move, marker, player_name)
+  subroutine player_turn(board, move)
     character(len=1), intent(inout) :: board(9)
     integer, intent(out) :: move
-    character(len=1), intent(in) :: marker
-    character(len=*), intent(in) :: player_name
     integer :: ios
 
     do
-      write (*, '(A, A, A)', advance='no') trim(player_name), '，请输入落子位置（1-9）：'
+      write (*, '(A)', advance='no') '请输入你的落子位置（1-9）：'
       read (*, *, iostat=ios) move
 
       if (ios /= 0) then
@@ -91,11 +90,52 @@ contains
       else if (board(move) /= ' ') then
         print *, '这个位置已经有棋子了。'
       else
-        board(move) = marker
+        board(move) = 'X'
         exit
       end if
     end do
   end subroutine player_turn
+
+  subroutine computer_turn(board, move)
+    character(len=1), intent(inout) :: board(9)
+    integer, intent(out) :: move
+    integer :: preferred(9)
+    integer :: i
+
+    move = find_winning_move(board, 'O')
+    if (move == 0) move = find_winning_move(board, 'X')
+
+    if (move == 0) then
+      preferred = (/5, 1, 3, 7, 9, 2, 4, 6, 8/)
+      do i = 1, 9
+        if (board(preferred(i)) == ' ') then
+          move = preferred(i)
+          exit
+        end if
+      end do
+    end if
+
+    if (move > 0) board(move) = 'O'
+  end subroutine computer_turn
+
+  integer function find_winning_move(board, player) result(move)
+    character(len=1), intent(in) :: board(9)
+    character(len=1), intent(in) :: player
+    character(len=1) :: test_board(9)
+    integer :: i
+
+    move = 0
+    do i = 1, 9
+      if (board(i) == ' ') then
+        test_board = board
+        test_board(i) = player
+        if (check_winner(test_board) == player) then
+          move = i
+          return
+        end if
+      end if
+    end do
+  end function find_winning_move
 
   character(len=1) function check_winner(board) result(winner)
     character(len=1), intent(in) :: board(9)
