@@ -101,14 +101,38 @@ contains
   subroutine print_board(board)
     character(len=3), intent(in) :: board(9)
 
-    print *, ''
-    print *, ' ', board(1), ' | ', board(2), ' | ', board(3)
-    print *, '---+---+---'
-    print *, ' ', board(4), ' | ', board(5), ' | ', board(6)
-    print *, '---+---+---'
-    print *, ' ', board(7), ' | ', board(8), ' | ', board(9)
-    print *, ''
+    write (*, '(A)') ''
+    call print_row(board, 1, 2, 3)
+    write (*, '(A)') '---+---+---'
+    call print_row(board, 4, 5, 6)
+    write (*, '(A)') '---+---+---'
+    call print_row(board, 7, 8, 9)
+    write (*, '(A)') ''
   end subroutine print_board
+
+  subroutine print_row(board, first, second, third)
+    character(len=3), intent(in) :: board(9)
+    integer, intent(in) :: first, second, third
+
+    call print_cell(board(first))
+    write (*, '(A)', advance='no') '|'
+    call print_cell(board(second))
+    write (*, '(A)', advance='no') '|'
+    call print_cell(board(third))
+    write (*, '(A)') ''
+  end subroutine print_row
+
+  subroutine print_cell(marker)
+    character(len=3), intent(in) :: marker
+
+    if (marker == '△') then
+      write (*, '(A)', advance='no') ' △ '
+    else if (marker == 'O') then
+      write (*, '(A)', advance='no') ' O '
+    else
+      write (*, '(A)', advance='no') '   '
+    end if
+  end subroutine print_cell
 
   subroutine human_turn(board, move, marker, prompt)
     character(len=3), intent(inout) :: board(9)
