@@ -2,7 +2,7 @@ program tic_tac_toe
   implicit none
 
   character(len=3) :: board(9)
-  integer :: move, turn_count
+  integer :: game_mode, move, turn_count
   character(len=3) :: winner
   logical :: finished
 
@@ -11,21 +11,31 @@ program tic_tac_toe
   winner = ' '
   finished = .false.
 
-  print *, '三子棋：玩家 △，对手电脑 O'
+  call choose_game_mode(game_mode)
+
+  if (game_mode == 1) then
+    print *, '三子棋：玩家 △，对手电脑 O'
+  else
+    print *, '三子棋：玩家 1 是 △，玩家 2 是 O'
+  end if
   print *, '输入 1 到 9 选择位置。位置如下：'
   call print_help()
 
   do while (.not. finished)
     call print_board(board)
-    call player_turn(board, move)
+    call human_turn(board, move, '△', '玩家 1，请输入落子位置（1-9）：')
     turn_count = turn_count + 1
 
     winner = check_winner(board)
     if (winner /= ' ') exit
     if (turn_count == 9) exit
 
-    call computer_turn(board, move)
-    print *, '电脑选择了位置 ', move
+    if (game_mode == 1) then
+      call computer_turn(board, move)
+      print *, '电脑选择了位置 ', move
+    else
+      call human_turn(board, move, 'O', '玩家 2，请输入落子位置（1-9）：')
+    end if
     turn_count = turn_count + 1
 
     winner = check_winner(board)
@@ -35,10 +45,14 @@ program tic_tac_toe
 
   call print_board(board)
 
-  if (winner == '△') then
+  if (game_mode == 1 .and. winner == '△') then
     print *, '你赢了！'
-  else if (winner == 'O') then
+  else if (game_mode == 1 .and. winner == 'O') then
     print *, '电脑赢了！'
+  else if (game_mode == 2 .and. winner == '△') then
+    print *, '玩家 1 赢了！'
+  else if (game_mode == 2 .and. winner == 'O') then
+    print *, '玩家 2 赢了！'
   else
     print *, '平局！'
   end if
@@ -53,6 +67,28 @@ contains
       board(i) = ' '
     end do
   end subroutine init_board
+
+  subroutine choose_game_mode(game_mode)
+    integer, intent(out) :: game_mode
+    integer :: ios
+
+    print *, '请选择游戏模式：'
+    print *, '1. 玩家对电脑'
+    print *, '2. 双人对战'
+
+    do
+      write (*, '(A)', advance='no') '请输入模式编号（1-2）：'
+      read (*, *, iostat=ios) game_mode
+
+      if (ios /= 0) then
+        print *, '输入无效，请输入数字 1 或 2。'
+      else if (game_mode < 1 .or. game_mode > 2) then
+        print *, '模式编号只能是 1 或 2。'
+      else
+        exit
+      end if
+    end do
+  end subroutine choose_game_mode
 
   subroutine print_help()
     print *, ' 1 | 2 | 3 '
@@ -74,13 +110,14 @@ contains
     print *, ''
   end subroutine print_board
 
-  subroutine player_turn(board, move)
+  subroutine human_turn(board, move, marker, prompt)
     character(len=3), intent(inout) :: board(9)
     integer, intent(out) :: move
+    character(len=*), intent(in) :: marker, prompt
     integer :: ios
 
     do
-      write (*, '(A)', advance='no') '请输入你的落子位置（1-9）：'
+      write (*, '(A)', advance='no') prompt
       read (*, *, iostat=ios) move
 
       if (ios /= 0) then
@@ -90,11 +127,11 @@ contains
       else if (board(move) /= ' ') then
         print *, '这个位置已经有棋子了。'
       else
-        board(move) = '△'
+        board(move) = marker
         exit
       end if
     end do
-  end subroutine player_turn
+  end subroutine human_turn
 
   subroutine computer_turn(board, move)
     character(len=3), intent(inout) :: board(9)
